@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catálogo de Perfumes Online</title>
+  <style>
+    /* Reset y estilos base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: #f8f9fa;
+      color: #333;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #5a3e36;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    /* Contenedor del buscador */
+    #search-container {
+      max-width: 600px;
+      margin: 0 auto 30px;
+      text-align: center;
+    }
+    #search-input {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 16px;
+      border: 2px solid #5a3e36;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    #search-input:focus {
+      border-color: #bb7a5a;
+    }
+
+    /* Grid de perfumes */
+    #catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Tarjeta de cada perfume */
+    .perfume-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(90, 62, 54, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .perfume-card:hover {
+      transform: translateY(-5px);
+    }
+    .perfume-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 1px solid #ddd;
+    }
+    .perfume-info {
+      padding: 15px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .perfume-name {
+      font-weight: 700;
+      font-size: 1.2em;
+      color: #5a3e36;
+      margin-bottom: 5px;
+    }
+    .perfume-brand {
+      font-style: italic;
+      color: #a87a62;
+      margin-bottom: 10px;
+    }
+    .perfume-description {
+      font-size: 0.9em;
+      color: #555;
+      flex-grow: 1;
+      margin-bottom: 10px;
+    }
+    .perfume-price {
+      font-weight: 700;
+      font-size: 1.1em;
+      color: #bb7a5a;
+      margin-bottom: 10px;
+    }
+    .btn-add {
+      background-color: #5a3e36;
+      border: none;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    .btn-add:hover {
+      background-color: #bb7a5a;
+    }
+
+    /* Carrito */
+    #cart {
+      max-width: 600px;
+      margin: 40px auto 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(90, 62, 54, 0.15);
+      padding: 20px;
+    }
+    #cart h2 {
+      color: #5a3e36;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    #cart-list {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    #cart-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1em;
+      color: #444;
+    }
+    #cart-total {
+      text-align: right;
+      font-weight: 700;
+      font-size: 1.1em;
+      color: #bb7a5a;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .perfume-image {
+        height: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Catálogo de Perfumes</h1>
+
+  <!-- Buscador para filtrar perfumes -->
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Buscar por nombre o marca..." />
+  </div>
+
+  <!-- Contenedor de perfumes -->
+  <div id="catalog"></div>
+
+  <!-- Carrito simulado -->
+  <section id="cart">
+    <h2>Carrito de Compras</h2>
+    <ul id="cart-list"></ul>
+    <div id="cart-total">Total: $0.00</div>
+  </section>
+
+  <script>
+    // Datos iniciales de perfumes (puedes agregar más)
+    const perfumes = [
+      {
+        id: 1,
+        name: "Eclat Femme",
+        brand: "Oriflame",
+        description: "Un aroma fresco y floral para mujeres seguras.",
+        price: 45.99,
+        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 2,
+        name: "Aqua Di Gio",
+        brand: "Giorgio Armani",
+        description: "Fragancia masculina fresca y acuática.",
+        price: 79.50,
+        image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 3,
+        name: "Light Blue",
+        brand: "Dolce & Gabbana",
+        description: "Aroma cítrico y refrescante, ideal para verano.",
+        price: 69.00,
+        image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 4,
+        name: "Black Orchid",
+        brand: "Tom Ford",
+        description: "Perfume intenso y sofisticado para ocasiones especiales.",
+        price: 120.00,
+        image: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 5,
+        name: "J’adore",
+        brand: "Dior",
+        description: "Un clásico floral elegante y femenino.",
+        price: 95.75,
+        image: "https://images.unsplash.com/photo-1513708921101-07b10f15315c?auto=format&fit=crop&w=400&q=80"
+      }
+    ];
+
+    // Estado del carrito
+    let cart = [];
+
+    // Referencias DOM
+    const catalogEl = document.getElementById('catalog');
+    const searchInput = document.getElementById('search-input');
+    const cartList = document.getElementById('cart-list');
+    const cartTotalEl = document.getElementById('cart-total');
+
+    // Función para mostrar perfumes en el catálogo
+    function renderCatalog(items) {
+      catalogEl.innerHTML = ''; // Limpiar catálogo
+
+      if (items.length === 0) {
+        catalogEl.innerHTML = '<p style="text-align:center; color:#888;">No se encontraron perfumes.</p>';
+        return;
+      }
+
+      items.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'perfume-card';
+
+        card.innerHTML = `
+          <img src="${p.image}" alt="${p.name}" class="perfume-image" />
+          <div class="perfume-info">
+            <div>
+              <div class="perfume-name">${p.name}</div>
+              <div class="perfume-brand">${p.brand}</div>
+              <div class="perfume-description">${p.description}</div>
+            </div>
+            <div>
+              <div class="perfume-price">$${p.price.toFixed(2)}</div>
+              <button class="btn-add" data-id="${p.id}">Agregar al carrito</button>
+            </div>
+          </div>
+        `;
+
+        catalogEl.appendChild(card);
+      });
+
+      // Agregar evento a botones "Agregar al carrito"
+      const addButtons = document.querySelectorAll('.btn-add');
+      addButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const id = parseInt(button.getAttribute('data-id'));
+          addToCart(id);
+        });
+      });
+    }
+
+    // Función para filtrar perfumes por búsqueda
+    function filterPerfumes(query) {
+      query = query.trim().toLowerCase();
+      if (!query) {
+        renderCatalog(perfumes);
+        return;
+      }
+      const filtered = perfumes.filter(p => 
+        p.name.toLowerCase().includes(query) || p.brand.toLowerCase().includes(query)
+      );
+      renderCatalog(filtered);
+    }
+
+    // Función para agregar un perfume al carrito
+    function addToCart(id) {
+      const item = perfumes.find(p => p.id === id);
+      if (!item) return;
+
+      // Verificar si ya está en el carrito
+      const found = cart.find(ci => ci.id === id);
+      if (found) {
+        found.qty++;
+      } else {
+        cart.push({ ...item, qty: 1 });
+      }
+      renderCart();
+    }
+
+    // Función para mostrar el carrito en el DOM
+    function renderCart() {
+      cartList.innerHTML = '';
+
+      if (cart.length === 0) {
+        cartList.innerHTML = '<li>El carrito está vacío.</li>';
+        cartTotalEl.textContent = 'Total: $0.00';
+        return;
+      }
+
+      let total = 0;
+      cart.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = ${item.name} (${item.qty});
+        const priceSpan = document.createElement('span');
+        priceSpan.textContent = $${(item.price * item.qty).toFixed(2)};
+        li.appendChild(priceSpan);
+        cartList.appendChild(li);
+        total += item.price * item.qty;
+      });
+
+      cartTotalEl.textContent = Total: $${total.toFixed(2)};
+    }
+
+    // Eventos
+    searchInput.addEventListener('input', (e) => {
+      filterPerfumes(e.target.value);
+    });
+
+    // Render inicial
+    renderCatalog(perfumes);
+    renderCart();
+
+  </script>
+
+</body>
+</html>
